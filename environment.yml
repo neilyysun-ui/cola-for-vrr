@@ -1,0 +1,8 @@
+name: vrr-final
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - google-genai>=1.0.0

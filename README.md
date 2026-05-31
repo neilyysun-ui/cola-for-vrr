@@ -1,26 +1,81 @@
 # cola-for-vrr
 
-Install dependencies:
+Compact inference package for VRR video question answering. The repository keeps the runnable prediction pipeline and lightweight utilities, while local data, keys, generated predictions, and caches stay outside version control.
+
+## Repository Structure
+
+```text
+.
+├── run_final.py                  # End-to-end inference runner
+├── requirements.txt              # Pip dependencies
+├── environment.yml               # Conda environment
+├── .env.example                  # Example runtime variables
+├── configs/
+│   └── run_full_inference.sh     # Shell recipe
+├── docs/
+│   ├── data_format.md            # Input and output schema
+│   └── method_overview.md        # Short method description
+├── examples/
+│   └── questions.example.json
+└── tools/
+    └── check_output.py           # Output validator
+```
+
+## Setup
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Run:
+or:
+
+```bash
+conda env create -f environment.yml
+conda activate vrr-final
+```
+
+Set the Gemini key in the environment:
+
+```bash
+export GEMINI_API_KEY=your_key_here
+```
+
+You can also pass a private key file with `--gemini-key`.
+
+## Run
 
 ```bash
 python run_final.py \
-  --questions-json test_qa.json \
-  --video-dir videos \
-  --gemini-key gemini_key.txt \
-  --output-json predictions.json \
-  --candidate-rounds 3 \
-  --verification-rounds 3 \
-  --min-agreement 2
+  --questions-json data/test_qa.json \
+  --video-dir data/videos \
+  --output-json outputs/predictions.json
 ```
 
-Input JSON is a list of questions with `question_id`, `question_text`, and `options`.
-Videos are resolved from `video-dir` by `question_id` first and `video_id` second.
-The flow is direct answer, hard-case routing, candidate bank construction, repeated candidate verification, risk gate, and final JSON.
-For routed hard cases, a candidate replaces the direct answer only when it reaches the agreement threshold and passes the risk gate.
-The script writes only the JSON specified by `--output-json`.
+The same command can be launched through the shell recipe:
+
+```bash
+QUESTIONS_JSON=data/test_qa.json \
+VIDEO_DIR=data/videos \
+OUTPUT_JSON=outputs/predictions.json \
+bash configs/run_full_inference.sh
+```
+
+Useful options:
+
+```text
+--model
+--candidate-rounds
+--verification-rounds
+--min-agreement
+--limit
+```
+
+## Validate
+
+```bash
+python tools/check_output.py \
+  --output-json outputs/predictions.json \
+  --questions-json data/test_qa.json
+```
+
+The runner writes a JSON list with `question_id` and `answer_choice`.
