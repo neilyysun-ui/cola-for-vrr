@@ -34,13 +34,7 @@ conda env create -f environment.yml
 conda activate vrr-final
 ```
 
-Set the Gemini key in the environment:
-
-```bash
-export GEMINI_API_KEY=your_key_here
-```
-
-You can also pass a private key file with `--gemini-key`.
+Set the Gemini key in the environment, or pass a private key file with `--gemini-key`.
 
 ## Run
 
